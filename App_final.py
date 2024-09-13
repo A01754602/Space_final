@@ -3,7 +3,7 @@ import numpy as np
 import requests
 
 # Establecer título y estilo de la página
-st.set_page_config(page_title="Spaceship Titanic - Supervivencia", page_icon="🚀")
+st.set_page_config(page_title="Spaceship Titanic :)", page_icon="🚀")
 
 # CSS para darle estilo espacial
 page_bg_img = '''
@@ -25,12 +25,11 @@ h1, h2, h3 {
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Título con diseño temático
-st.title("🪐 Predicción de Supervivencia en el Titanic Espacial 🛸")
+st.title("🪐 Spaceship Titanic :) 🛸")
 
 # Subtítulo con un breve texto
 st.subheader("🚀 ¿Sobrevivirías el viaje interestelar? Descúbrelo con nuestro modelo de predicción 🤖")
 
-# Crear selectboxes para entradas categóricas
 home_planet = st.selectbox("🌍 Planeta de origen", ["Earth", "Europa", "Mars"])
 cryosleep = st.radio("❄️ ¿Estaba en Criosueño?", ["Sí", "No"])
 destination = st.selectbox("🌌 Destino", ["TRAPPIST-1e", "55 Cancri e", "PSO J318.5-22"])
@@ -47,17 +46,16 @@ spa = st.number_input("🛀 Spa", min_value=0, max_value=10000, value=0, step=1)
 vr_deck = st.number_input("🎮 VR Deck", min_value=0, max_value=10000, value=0, step=1)
 num = st.number_input("🔢 Número de Cabina", min_value=0, max_value=2000, value=0, step=1)
 
-# Botón para predecir con efecto hover
-if st.button("🌟 Predecir Supervivencia"):
-    # Convertir las entradas a los valores correctos que el modelo espera
+if st.button("🌟 Predecir si sobrevive"):
+    # Convierte los valores a las entradas esperadas del modelo
     cryosleep_val = 1 if cryosleep == "Sí" else 0
     home_planet_val = {"Earth": 0.424, "Europa": 0.626, "Mars": 0.5586}[home_planet]
     destination_val = {"TRAPPIST-1e": 0.4711, "55 Cancri e": 0.61, "PSO J318.5-22": 0.5037}[destination]
     deck_val = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "T": 7}[deck]
     side_val = {"P": 0, "S": 1}[side]
-    vip_val = 1 if vip == "Sí" else 0  # Convertir VIP a valor numérico
+    vip_val = 1 if vip == "Sí" else 0
 
-    # Crear el JSON con los datos
+    # Enviar los datos al servidor Flask
     input_data = {
         "HomePlanet": home_planet_val,
         "CryoSleep": cryosleep_val,
@@ -71,10 +69,10 @@ if st.button("🌟 Predecir Supervivencia"):
         "Deck": deck_val,
         "Side": side_val,
         "Num": num,
-        "VIP": vip_val  # Incluir VIP en los datos enviados
+        "VIP": vip_val  
     }
 
-    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"  # Cambia la IP si es necesario
+    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"  
 
     try:
         response = requests.post(FLASK_API_URL, json=input_data)
@@ -83,9 +81,9 @@ if st.button("🌟 Predecir Supervivencia"):
 
         # Mostrar el resultado de la predicción
         if prediction:
-            st.success('🟢 ¡El pasajero sobrevivirá la aventura espacial! 🎉')
+            st.success('🟢 ¡El pasajero sobrevivirá! 🎉')
         else:
-            st.error('🔴 Desafortunadamente, el pasajero no sobrevivirá. 💫')
+            st.error('🔴 Desafortunadamente, el pasajero no sobrevivirá :(')
     
     except requests.exceptions.HTTPError as http_err:
         st.error(f"HTTP error occurred: {http_err}")  # Muestra el error HTTP
@@ -97,4 +95,4 @@ if st.button("🌟 Predecir Supervivencia"):
 
 # Pie de página con información adicional
 st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("✨ *AAAAAAAAAAAAA* 🛸")
+st.markdown(" *AAAAAAAAAAAAA*")

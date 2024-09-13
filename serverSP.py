@@ -3,16 +3,16 @@ import numpy as np
 import joblib
 from sklearn.preprocessing import MinMaxScaler
 
-# Cargar el modelo de votación entrenado
-model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guardado
+# Cargar el modelo entrenado 
+model = joblib.load('voting_model.joblib')  # Modelo final
 
-# Crear el scaler que fue usado durante el entrenamiento
+# Escalamiento de las variables
 scaler = MinMaxScaler()
 
-# Crear la aplicación Flask
+# Crear el servidor Flask
 app = Flask(__name__)
 
-# Definir la ruta de predicción
+# Definir la ruta
 @app.route('/predictjson', methods=['POST'])
 def predictjson():
     try:
@@ -20,7 +20,6 @@ def predictjson():
         data = request.json  
         print("Datos recibidos:", data)  # Depurar los datos recibidos
 
-        # Verificar que todas las claves están presentes en los datos recibidos
         required_keys = ['HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt',
                          'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num', 'VIP']
         for key in required_keys:
@@ -47,19 +46,19 @@ def predictjson():
         # Normalizar los datos antes de hacer la predicción
         input_data_scaled = scaler.fit_transform(input_data)
 
-        # Realizar la predicción utilizando el modelo cargado
+        # Realizar la predicción utilizando el modelo final
         prediction = model.predict(input_data_scaled)
 
         # Devolver la predicción como JSON
         return jsonify({'Prediction': bool(prediction[0])})
 
     except ValueError as ve:
-        print(f"Error de valor: {str(ve)}")  # Depuración de errores en la entrada de datos
-        return jsonify({'error': str(ve)}), 400  # Retornar un error 400 si faltan datos
+        print(f"Error de valor: {str(ve)}")  
+        return jsonify({'error': str(ve)}), 400  
 
     except Exception as e:
-        print(f"Error en la predicción: {str(e)}")  # Depuración de errores generales
-        return jsonify({'error': str(e)}), 500  # Retornar un error 500 para otros errores
+        print(f"Error en la predicción: {str(e)}")  
+        return jsonify({'error': str(e)}), 500  
 
 # Iniciar el servidor Flask
 if __name__ == '__main__':
