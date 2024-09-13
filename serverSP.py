@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
 import numpy as np
 import joblib
+from sklearn.preprocessing import MinMaxScaler
 
 # Cargar el modelo de votación entrenado
-model = joblib.load('voting_model.joblib')
+model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guardado
 
-# Obtener los nombres de las características utilizadas durante el entrenamiento
-feature_names = model.feature_names_in_  # Este atributo contiene los nombres originales de las características
+# Crear el scaler que fue usado durante el entrenamiento
+scaler = MinMaxScaler()
 
 # Crear la aplicación Flask
 app = Flask(__name__)
@@ -19,7 +20,14 @@ def predictjson():
         data = request.json  
         print("Datos recibidos:", data)  # Depurar los datos recibidos
 
-        # Reorganizar los datos según el orden correcto de características
+        # Verificar que todas las claves están presentes en los datos recibidos
+        required_keys = ['HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt',
+                         'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num', 'VIP']
+        for key in required_keys:
+            if key not in data:
+                raise ValueError(f"Falta el valor requerido: {key}")
+
+        # Convertir los datos a un array numpy en el formato que el modelo espera
         input_data = np.array([
             data['HomePlanet'],
             data['CryoSleep'],
@@ -34,21 +42,23 @@ def predictjson():
             data['Side'],
             data['Num'],
             data['VIP']
-        ])
+        ]).reshape(1, -1)
+
+        # Normalizar los datos antes de hacer la predicción
+        input_data_scaled = scaler.fit_transform(input_data)
 
         # Realizar la predicción utilizando el modelo cargado
-        prediction = model.predict(input_data.reshape(1, -1))
-        probabilities = model.predict_proba(input_data.reshape(1, -1))
+        prediction = model.predict(input_data_scaled)
 
-        # Devolver la predicción y probabilidades como JSON
-        return jsonify({'Prediction': bool(prediction[0]), 'Probabilities': probabilities.tolist()})
+        # Devolver la predicción como JSON
+        return jsonify({'Prediction': bool(prediction[0])})
 
     except ValueError as ve:
-        print(f"Error de valor: {str(ve)}")
-        return jsonify({'error': str(ve)}), 400  # Retornar un error 400 si faltan datos o son incorrectos
+        print(f"Error de valor: {str(ve)}")  # Depuración de errores en la entrada de datos
+        return jsonify({'error': str(ve)}), 400  # Retornar un error 400 si faltan datos
 
     except Exception as e:
-        print(f"Error en la predicción: {str(e)}")
+        print(f"Error en la predicción: {str(e)}")  # Depuración de errores generales
         return jsonify({'error': str(e)}), 500  # Retornar un error 500 para otros errores
 
 # Iniciar el servidor Flask

@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import requests
-from sklearn.preprocessing import MinMaxScaler
 
 # Establecer título y estilo de la página
 st.set_page_config(page_title="Spaceship Titanic - Supervivencia", page_icon="🚀")
@@ -31,26 +30,22 @@ st.title("🪐 Predicción de Supervivencia en el Titanic Espacial 🛸")
 # Subtítulo con un breve texto
 st.subheader("🚀 ¿Sobrevivirías el viaje interestelar? Descúbrelo con nuestro modelo de predicción 🤖")
 
-# Crear los selectboxes y entradas manuales
+# Crear selectboxes para entradas categóricas
 home_planet = st.selectbox("🌍 Planeta de origen", ["Earth", "Europa", "Mars"])
 cryosleep = st.radio("❄️ ¿Estaba en Criosueño?", ["Sí", "No"])
-age = st.number_input("👶 Edad", min_value=0, max_value=100, step=1)
-room_service = st.number_input("🛎️ Room Service", min_value=0, max_value=10000, step=1)
-food_court = st.number_input("🍔 Food Court", min_value=0, max_value=10000, step=1)
-shopping_mall = st.number_input("🛒 Shopping Mall", min_value=0, max_value=10000, step=1)
-spa = st.number_input("🛀 Spa", min_value=0, max_value=10000, step=1)
-vr_deck = st.number_input("🎮 VR Deck", min_value=0, max_value=10000, step=1)
 destination = st.selectbox("🌌 Destino", ["TRAPPIST-1e", "55 Cancri e", "PSO J318.5-22"])
 deck = st.selectbox("🛳️ Deck", ["A", "B", "C", "D", "E", "F", "G", "T"])
 side = st.selectbox("🔄 Side", ["P", "S"])
-num = st.number_input("🔢 Número de Cabina", min_value=0, max_value=2000, step=1)
-vip = st.radio("💎 ¿El pasajero es VIP?", ["Sí", "No"])  # Nueva opción para VIP
+vip = st.radio("💎 ¿El pasajero es VIP?", ["Sí", "No"])
 
-# Escalar datos numéricos usando MinMaxScaler
-scaler = MinMaxScaler()
-scaled_data = scaler.fit_transform(np.array([[age, room_service, food_court, shopping_mall, spa, vr_deck, num]]))
-
-age_scaled, room_service_scaled, food_court_scaled, shopping_mall_scaled, spa_scaled, vr_deck_scaled, num_scaled = scaled_data[0]
+# Crear inputs manuales para valores numéricos
+age = st.number_input("👶 Edad", min_value=0, max_value=100, value=30, step=1)
+room_service = st.number_input("🛎️ Room Service", min_value=0, max_value=10000, value=0, step=1)
+food_court = st.number_input("🍔 Food Court", min_value=0, max_value=10000, value=0, step=1)
+shopping_mall = st.number_input("🛒 Shopping Mall", min_value=0, max_value=10000, value=0, step=1)
+spa = st.number_input("🛀 Spa", min_value=0, max_value=10000, value=0, step=1)
+vr_deck = st.number_input("🎮 VR Deck", min_value=0, max_value=10000, value=0, step=1)
+num = st.number_input("🔢 Número de Cabina", min_value=0, max_value=2000, value=0, step=1)
 
 # Botón para predecir con efecto hover
 if st.button("🌟 Predecir Supervivencia"):
@@ -66,27 +61,28 @@ if st.button("🌟 Predecir Supervivencia"):
     input_data = {
         "HomePlanet": home_planet_val,
         "CryoSleep": cryosleep_val,
-        "Age": age_scaled,
-        "RoomService": room_service_scaled,
-        "FoodCourt": food_court_scaled,
-        "ShoppingMall": shopping_mall_scaled,
-        "Spa": spa_scaled,
-        "VRDeck": vr_deck_scaled,
+        "Age": age,
+        "RoomService": room_service,
+        "FoodCourt": food_court,
+        "ShoppingMall": shopping_mall,
+        "Spa": spa,
+        "VRDeck": vr_deck,
         "Destination": destination_val,
         "Deck": deck_val,
         "Side": side_val,
-        "Num": num_scaled,
+        "Num": num,
         "VIP": vip_val  # Incluir VIP en los datos enviados
     }
 
-    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"
+    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"  # Cambia la IP si es necesario
 
     try:
         response = requests.post(FLASK_API_URL, json=input_data)
         response.raise_for_status()  # Verifica que no hubo un error HTTP
         prediction = response.json().get('Prediction')
 
-        if prediction == 'True':
+        # Mostrar el resultado de la predicción
+        if prediction:
             st.success('🟢 ¡El pasajero sobrevivirá la aventura espacial! 🎉')
         else:
             st.error('🔴 Desafortunadamente, el pasajero no sobrevivirá. 💫')
