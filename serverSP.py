@@ -18,7 +18,7 @@ def predictjson():
 
         # Verificar que todas las claves están presentes en los datos recibidos
         required_keys = ['HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt',
-                         'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num']
+                         'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num', 'VIP']
         for key in required_keys:
             if key not in data:
                 raise ValueError(f"Falta el valor requerido: {key}")
@@ -36,7 +36,8 @@ def predictjson():
             data['Destination'],
             data['Deck'],
             data['Side'],
-            data['Num']
+            data['Num'],
+            data['VIP']  # Asegurarse de incluir la columna VIP
         ])
 
         # Realizar la predicción utilizando el modelo cargado

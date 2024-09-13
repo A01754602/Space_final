@@ -43,6 +43,7 @@ destination = st.selectbox("🌌 Destino", ["TRAPPIST-1e", "55 Cancri e", "PSO J
 deck = st.selectbox("🛳️ Deck", ["A", "B", "C", "D", "E", "F", "G", "T"])
 side = st.selectbox("🔄 Side", ["P", "S"])
 num = st.number_input("🔢 Número de Cabina", min_value=0, max_value=2000, step=1)
+vip = st.radio("💎 ¿El pasajero es VIP?", ["Sí", "No"])  # Nueva opción para VIP
 
 # Botón para predecir con efecto hover
 if st.button("🌟 Predecir Supervivencia"):
@@ -52,6 +53,7 @@ if st.button("🌟 Predecir Supervivencia"):
     destination_val = {"TRAPPIST-1e": 0.4711, "55 Cancri e": 0.61, "PSO J318.5-22": 0.5037}[destination]
     deck_val = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "T": 7}[deck]
     side_val = {"P": 0, "S": 1}[side]
+    vip_val = 1 if vip == "Sí" else 0  # Convertir VIP a valor numérico
 
     # Crear el JSON con los datos
     input_data = {
@@ -66,10 +68,11 @@ if st.button("🌟 Predecir Supervivencia"):
         "Destination": destination_val,
         "Deck": deck_val,
         "Side": side_val,
-        "Num": num
+        "Num": num,
+        "VIP": vip_val  # Incluir VIP en los datos enviados
     }
 
-    FLASK_API_URL = "http://34.229.203.135:8080/predictjson"
+    FLASK_API_URL = "http://3.94.186.22:8080/predictjson"
 
     try:
         response = requests.post(FLASK_API_URL, json=input_data)
