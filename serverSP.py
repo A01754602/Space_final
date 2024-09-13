@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import numpy as np
 import joblib
+import pandas as pd
 
 # Cargar el modelo de votación entrenado
 model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guardado
@@ -37,14 +38,22 @@ def predictjson():
             data['Deck'],
             data['Side'],
             data['Num'],
-            data['VIP']  # Asegurarse de incluir la columna VIP
+            data['VIP']
         ])
 
-        # Realizar la predicción utilizando el modelo cargado
-        prediction = model.predict(input_data.reshape(1, -1))
+        # Lista de nombres de las columnas que el modelo espera
+        column_names = ['HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt',
+                        'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num', 'VIP']
 
-        # Devolver la predicción como JSON
-        return jsonify({'Prediction': bool(prediction[0])})
+        # Crear un DataFrame con los nombres de las columnas
+        input_df = pd.DataFrame([input_data], columns=column_names)
+
+        # Realizar la predicción utilizando el modelo cargado
+        prediction = model.predict(input_df)
+        probabilities = model.predict_proba(input_df)
+
+        # Devolver la predicción y las probabilidades como JSON
+        return jsonify({'Prediction': bool(prediction[0]), 'Probabilities': probabilities.tolist()})
 
     except ValueError as ve:
         print(f"Error de valor: {str(ve)}")  # Depuración de errores en la entrada de datos
