@@ -9,6 +9,10 @@ model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guard
 # Crear la aplicación Flask
 app = Flask(__name__)
 
+# Definir el orden correcto de las características, tal como fue durante el entrenamiento
+FEATURE_ORDER = ['HomePlanet', 'CryoSleep', 'Destination', 'Age', 'RoomService', 'FoodCourt', 
+                 'ShoppingMall', 'Spa', 'VRDeck', 'Deck', 'Side', 'Num', 'VIP']
+
 # Definir la ruta de predicción
 @app.route('/predictjson', methods=['POST'])
 def predictjson():
@@ -17,29 +21,22 @@ def predictjson():
         data = request.json  
         print("Datos recibidos:", data)  # Depurar los datos recibidos
 
-        # Definir los nombres de las características que espera el modelo
-        input_features = [
-            'HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt', 
-            'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 
-            'Num', 'VIP'
-        ]
-
-        # Convertir los datos a un DataFrame de pandas para que incluya los nombres de las características
+        # Convertir los datos a un DataFrame de pandas con las características en el orden correcto
         input_data = pd.DataFrame([[
             data['HomePlanet'],
             data['CryoSleep'],
+            data['Destination'],
             data['Age'],
             data['RoomService'],
             data['FoodCourt'],
             data['ShoppingMall'],
             data['Spa'],
             data['VRDeck'],
-            data['Destination'],
             data['Deck'],
             data['Side'],
             data['Num'],
             data['VIP']
-        ]], columns=input_features)
+        ]], columns=FEATURE_ORDER)
 
         print("Datos para predicción:", input_data)
 
