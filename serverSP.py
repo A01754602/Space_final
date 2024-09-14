@@ -6,7 +6,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Cargar el modelo
-model = joblib.load("/path/to/your/voting_model.joblib")
+model = joblib.load("voting_model.joblib")
 
 # Función para predicción
 @app.route('/predictjson', methods=['POST'])
