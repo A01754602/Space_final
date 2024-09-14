@@ -61,20 +61,20 @@ if st.button("🌟 Predecir Supervivencia"):
     input_data = {
         "HomePlanet": home_planet_val,
         "CryoSleep": cryosleep_val,
+        "Destination": destination_val,
         "Age": age,
         "RoomService": room_service,
         "FoodCourt": food_court,
         "ShoppingMall": shopping_mall,
         "Spa": spa,
         "VRDeck": vr_deck,
-        "Destination": destination_val,
         "Deck": deck_val,
         "Side": side_val,
         "Num": num,
         "VIP": vip_val  # Incluir VIP en los datos enviados
     }
 
-    FLASK_API_URL = "http://54.91.148.212:8080/predictjson"  # Cambia la IP si es necesario
+    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"  # Cambia la IP si es necesario
 
     try:
         response = requests.post(FLASK_API_URL, json=input_data)
