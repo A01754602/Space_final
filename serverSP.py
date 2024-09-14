@@ -1,58 +1,40 @@
-import pandas as pd
-import numpy as np
 from flask import Flask, request, jsonify
 import joblib
+import pandas as pd
 
-# Cargar el modelo de votación entrenado
-model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guardado
-
-# Crear la aplicación Flask
+# Inicializamos la aplicación Flask
 app = Flask(__name__)
 
-# Definir la ruta de predicción
+# Cargar el modelo
+model = joblib.load("/path/to/your/voting_model.joblib")
+
+# Función para predicción
 @app.route('/predictjson', methods=['POST'])
-def predictjson():
+def predict():
     try:
-        # Recibir los datos en formato JSON
-        data = request.json  
-        print("Datos recibidos:", data)  # Depuración de los datos recibidos
+        # Obtener los datos JSON del request
+        input_data = request.get_json()
+        print(f"Datos recibidos: {input_data}")
 
-        # Crear un DataFrame con el orden de características correcto
-        input_data = pd.DataFrame([[
-            data['HomePlanet'],
-            data['CryoSleep'],
-            data['Destination'],
-            data['Age'],
-            data['VIP'],
-            data['RoomService'],
-            data['FoodCourt'],
-            data['ShoppingMall'],
-            data['Spa'],
-            data['VRDeck'],
-            data['Deck'],
-            data['Num'],
-            data['Side']
-        ]], columns=[
-            'HomePlanet', 'CryoSleep', 'Destination', 'Age', 'VIP', 'RoomService',
-            'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck', 'Deck', 'Num', 'Side'
-        ])
-
-        print("Datos para predicción:", input_data)  # Depuración del DataFrame preparado
-
-        # Realizar la predicción utilizando el modelo cargado
-        prediction = model.predict(input_data)
-
-        # Devolver la predicción como JSON
-        return jsonify({'Prediction': bool(prediction[0])})
-
-    except ValueError as ve:
-        print(f"Error de valor: {str(ve)}")  # Depuración de errores en la entrada de datos
-        return jsonify({'error': str(ve)}), 400  # Retornar un error 400 si faltan datos
+        # Convertir el JSON en un DataFrame de pandas
+        df = pd.DataFrame([input_data])
+        
+        # Asegurar que las columnas están en el orden correcto
+        df = df[['HomePlanet', 'CryoSleep', 'Destination', 'Age', 'VIP', 'RoomService', 
+                 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck', 'Deck', 'Num', 'Side']]
+        
+        print(f"Datos para predicción: {df}")
+        
+        # Realizar la predicción
+        prediction = model.predict(df)[0]
+        print(f"Predicción: {prediction}")
+        
+        # Devolver el resultado en formato JSON
+        return jsonify({'Prediction': bool(prediction)})
 
     except Exception as e:
-        print(f"Error en la predicción: {str(e)}")  # Depuración de errores generales
-        return jsonify({'error': str(e)}), 500  # Retornar un error 500 para otros errores
+        return jsonify({'error': str(e)}), 400
 
-# Iniciar el servidor Flask
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
+# Iniciar la aplicación
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8080)
