@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import numpy as np
-import joblib
 import pandas as pd
+import joblib
 
 # Cargar el modelo de votación entrenado
 model = joblib.load('voting_model.joblib')  # Cargar el modelo previamente guardado
@@ -17,7 +17,14 @@ def predictjson():
         data = request.json  
         print("Datos recibidos:", data)  # Depurar los datos recibidos
 
-        # Crear un DataFrame con los datos recibidos y nombres de las columnas
+        # Definir los nombres de las características que espera el modelo
+        input_features = [
+            'HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt', 
+            'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 
+            'Num', 'VIP'
+        ]
+
+        # Convertir los datos a un DataFrame de pandas para que incluya los nombres de las características
         input_data = pd.DataFrame([[
             data['HomePlanet'],
             data['CryoSleep'],
@@ -32,8 +39,9 @@ def predictjson():
             data['Side'],
             data['Num'],
             data['VIP']
-        ]], columns=['HomePlanet', 'CryoSleep', 'Age', 'RoomService', 'FoodCourt',
-                     'ShoppingMall', 'Spa', 'VRDeck', 'Destination', 'Deck', 'Side', 'Num', 'VIP'])
+        ]], columns=input_features)
+
+        print("Datos para predicción:", input_data)
 
         # Realizar la predicción utilizando el modelo cargado
         prediction = model.predict(input_data)
