@@ -57,7 +57,7 @@ if st.button("🌟 Predecir Supervivencia"):
     side_val = {"P": 0, "S": 1}[side]
     vip_val = 1 if vip == "Sí" else 0  # Convertir VIP a valor numérico
 
-    # Crear el JSON con los datos
+    # Crear el JSON con los datos en el mismo orden que el modelo espera
     input_data = {
         "HomePlanet": home_planet_val,
         "CryoSleep": cryosleep_val,
@@ -74,7 +74,9 @@ if st.button("🌟 Predecir Supervivencia"):
         "VIP": vip_val  # Incluir VIP en los datos enviados
     }
 
-    FLASK_API_URL = "http://34.228.165.103:8080/predictjson"  # Cambia la IP si es necesario
+    st.write("Datos enviados:", input_data)
+
+    FLASK_API_URL = "http://54.91.148.212:8080/predictjson"  # Cambia la IP si es necesario
 
     try:
         response = requests.post(FLASK_API_URL, json=input_data)
@@ -92,7 +94,7 @@ if st.button("🌟 Predecir Supervivencia"):
     except requests.exceptions.RequestException as err:
         st.error(f"Error occurred: {err}")  # Muestra otros errores de solicitud
     except ValueError as json_err:
-        st.error(f"Error al decodificar la respuesta JSON: {json_err}")  # Muestra errores de decodificación JSON
+        st.error(f"Error al decodificar la respuesta JSON: {json_err}")
         st.text(response.text)  # Muestra la respuesta recibida (aunque no sea JSON)
 
 # Pie de página con información adicional
